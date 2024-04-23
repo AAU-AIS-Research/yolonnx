@@ -63,7 +63,7 @@ class Classifier(Generic[T]):
 
     def run(self, img: T) -> Sequence[ClassifierResult]:
         tensor = self.__to_tensor_strategy(img, *self.shape)
-        results = self.__session.run(None, {"images": tensor})[0]
+        results = self.__session.run(None, {"images": tensor.data})[0]
 
         if isinstance(results, SparseTensorProtocol):
             results = results.values()
