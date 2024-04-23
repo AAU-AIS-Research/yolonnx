@@ -1,6 +1,6 @@
 # PDM
 .pdm-python
-# .pdm-build
+.pdm-build
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

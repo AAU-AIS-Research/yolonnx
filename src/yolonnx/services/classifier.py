@@ -1,6 +1,5 @@
 import ast
 import logging
-from asyncio import Future
 from typing import Generic, Sequence, TypeVar
 
 import numpy
@@ -70,15 +69,3 @@ class Classifier(Generic[T]):
             results = results.values()
 
         return self.__result_handler(results[0])
-
-    async def run_async(self, img: T) -> Sequence[ClassifierResult]:
-        def callback(results: list[NDArray], user_data: Future, err: str) -> None:
-            rv = self.__result_handler(results[0][0])
-            user_data.set_result(rv)
-            if err:
-                logger.error(err)
-
-        tensor = self.__to_tensor_strategy(img, *self.shape)
-        future = Future[list[ClassifierResult]]()
-        self.__session.run_async(None, {"images": tensor}, callback, future)
-        return await future
