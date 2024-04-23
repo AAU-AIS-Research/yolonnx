@@ -5,12 +5,12 @@
 groups = ["default", "test"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:fa7b8d8e10b14c6f4e96a4720959e46adabb9b6db8e8e745344680950f19de63"
+content_hash = "sha256:204b135b798fef168f15e71d33426bdd5bb89d1d82ba48d3585c90c395666d2a"
 
 [[package]]
 name = "aau-label"
-version = "0.1.0"
-requires_python = ">=3.9"
+version = "0.2.0"
+requires_python = ">=3.10"
 summary = "A image labeling handler"
 groups = ["default"]
 dependencies = [
@@ -18,8 +18,8 @@ dependencies = [
     "pillow==10.3.*",
 ]
 files = [
-    {file = "aau_label-0.1.0-py3-none-any.whl", hash = "sha256:b3ed819ceb3b2f2d21bbd1f03728e39f7f5af8b653e7a84bf2348599c54d2c50"},
-    {file = "aau_label-0.1.0.tar.gz", hash = "sha256:6ea8f963bcd8b46c63dc0678817e34f25945d443aa4f3d156c361fbab6c6a5eb"},
+    {file = "aau_label-0.2.0-py3-none-any.whl", hash = "sha256:7fc590a8c5951e4187bac2f2dec4322e361448ff68013763deea1c0e0cb02693"},
+    {file = "aau_label-0.2.0.tar.gz", hash = "sha256:08371088a579af33466383aa8c8ab37cab639465f08b5b7d233cd7e4c6aef794"},
 ]
 
 [[package]]

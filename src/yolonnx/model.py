@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from aau_label.model import Label
+from aau_label.model import AAULabel
 from numpy.typing import NDArray
 
 
@@ -20,9 +20,9 @@ class ImgTensor:
 
 @dataclass
 class ClassifierResult:
-    classifier: str
+    name: str
     score: float
 
 
 @dataclass
-class DetectorResult(ClassifierResult, Label): ...
+class DetectorResult(ClassifierResult, AAULabel): ...

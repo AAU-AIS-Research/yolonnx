@@ -56,8 +56,8 @@ class Classifier(Generic[T]):
         rv: list[ClassifierResult] = []
         for i in range(len(labels_idx)):
             id = labels_idx[i][0]
-            classifier = self.names[id]
-            rv.append(ClassifierResult(classifier=classifier, score=scores[i]))
+            label_name = self.names[id]
+            rv.append(ClassifierResult(name=label_name, score=scores[i]))
 
         rv.sort(key=lambda x: x.score, reverse=True)
         return rv

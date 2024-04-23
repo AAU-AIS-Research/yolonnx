@@ -1,7 +1,5 @@
 import ast
-import asyncio
 import logging
-from asyncio import Future
 from typing import Generic, Sequence, TypeVar, cast
 
 import numpy
@@ -83,7 +81,7 @@ class Detector(Generic[T]):
                     y=bbox[1].item(),
                     width=bbox[2].item(),
                     height=bbox[3].item(),
-                    classifier=self.__names[label],
+                    name=self.__names[label],
                     score=score.item(),
                 )
             )
