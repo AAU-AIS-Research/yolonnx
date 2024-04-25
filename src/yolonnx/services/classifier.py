@@ -22,10 +22,12 @@ class Classifier(Generic[T]):
         self,
         session: InferenceSessionProtocol,
         to_tensor_strategy: ToTensorStrategyProtocol[T],
+        none_cls_name: str = "none",
         threshold: float = 0.1,
     ) -> None:
         self.__session = session
         self.__to_tensor_strategy = to_tensor_strategy
+        self.__non_cls_name = none_cls_name
         self.__threshold = threshold
         meta = self.__session.get_modelmeta()
         self.__names: dict[int, str] = ast.literal_eval(
@@ -56,7 +58,8 @@ class Classifier(Generic[T]):
         for i in range(len(labels_idx)):
             id = labels_idx[i][0]
             label_name = self.names[id]
-            rv.append(ClassifierResult(name=label_name, score=scores[i]))
+            if label_name != self.__non_cls_name:
+                rv.append(ClassifierResult(name=label_name, score=scores[i][0]))
 
         rv.sort(key=lambda x: x.score, reverse=True)
         return rv
