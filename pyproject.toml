@@ -1,7 +1,7 @@
 [project]
 name = "yolonnx"
 version = "0.1.3"
-description = "You Only Look ONNX"
+description = "This package lets you run your YOLOv8 detection and classification models using ONNXRuntime."
 authors = [
     {name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk"},
 ]
