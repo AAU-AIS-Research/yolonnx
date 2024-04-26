@@ -23,7 +23,6 @@ class Classifier(Generic[T]):
         session: InferenceSessionProtocol,
         to_tensor_strategy: ToTensorStrategyProtocol[T],
         name_converter: Callable[[str], str] | None = None,
-        none_cls_name: str = "none",
         threshold: float = 0.1,
     ) -> None:
         """
@@ -33,7 +32,6 @@ class Classifier(Generic[T]):
             session (InferenceSessionProtocol): The inference session for the classifier.
             to_tensor_strategy (ToTensorStrategyProtocol[T]): The strategy for converting input data to tensor.
             name_converter (Callable[[str], str] | None, optional): A function to convert class names. Defaults to None.
-            none_cls_name (str, optional): The name for the "none" class. Defaults to "none".
             threshold (float, optional): The threshold value. Defaults to 0.1.
 
         Returns:
@@ -41,7 +39,6 @@ class Classifier(Generic[T]):
         """
         self.__session = session
         self.__to_tensor_strategy = to_tensor_strategy
-        self.__non_cls_name = none_cls_name
         self.__threshold = threshold
         meta = self.__session.get_modelmeta()
         self.__names: dict[int, str] = ast.literal_eval(
@@ -95,8 +92,7 @@ class Classifier(Generic[T]):
         for i in range(len(labels_idx)):
             id = labels_idx[i][0]
             label_name = self.names[id]
-            if label_name != self.__non_cls_name:
-                rv.append(ClassifierResult(name=label_name, score=scores[i][0]))
+            rv.append(ClassifierResult(name=label_name, score=scores[i][0]))
 
         rv.sort(key=lambda x: x.score, reverse=True)
         return rv
@@ -110,6 +106,7 @@ class Classifier(Generic[T]):
 
         Returns:
             Sequence[ClassifierResult]: A sequence of ClassifierResult objects representing the classification results.
+            If no result sattisfies the threshold, an empty sequence is returned.
         """
         tensor = self.__to_tensor_strategy(img, *self.shape)
         results = self.__session.run(None, {"images": tensor.data})[0]
