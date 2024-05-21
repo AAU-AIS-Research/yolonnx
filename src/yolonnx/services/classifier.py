@@ -92,7 +92,7 @@ class Classifier(Generic[T]):
         for i in range(len(labels_idx)):
             id = labels_idx[i][0]
             label_name = self.names[id]
-            rv.append(ClassifierResult(name=label_name, score=scores[i][0]))
+            rv.append(ClassifierResult(name=label_name, score=scores[i][0].item()))
 
         rv.sort(key=lambda x: x.score, reverse=True)
         return rv
