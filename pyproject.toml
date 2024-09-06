@@ -1,15 +1,15 @@
 [project]
 name = "yolonnx"
-version = "0.1.5"
+version = "0.2.0"
 description = "This package lets you run your YOLOv8 detection and classification models using ONNXRuntime."
 authors = [
     {name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk"},
 ]
 dependencies = [
     "numpy==1.26.*",
-    "aau-label==0.2.*"
+    "aau-label==0.*"
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 readme = "README.md"
 license = {text = "MIT"}
 keywords = ["ONNX", "YOLOv8", "onnxruntime", "vision"]
