@@ -20,7 +20,8 @@ session = InferenceSession(
     ],
 )
 
-predictor = Detector(session, PillowToTensorContainStrategy())
+# For backward compatibility reasons the Yolo8ModelOutputParser is used by default
+predictor = Detector(session, PillowToTensorContainStrategy(), ModelOutputParser=Yolo26ModelOutputParser())
 img = Image.open("path/to/image.jpg")
 print(predictor.run(img))
 ```
