@@ -6,23 +6,23 @@ from aau_label.model import AAULabel
 from numpy.typing import NDArray
 
 
-@dataclass
+@dataclass(slots=True, frozen=True)
 class Size:
     width: float
     height: float
 
 
-@dataclass
+@dataclass(slots=True, frozen=True)
 class ImgTensor:
     scale: Size
     data: NDArray
 
 
-@dataclass
+@dataclass(slots=True)
 class ClassifierResult:
     name: str
     score: float
 
 
-@dataclass
+@dataclass(slots=True)
 class DetectorResult(ClassifierResult, AAULabel): ...
