@@ -5,10 +5,11 @@ from typing import Any, Generic, Protocol, Sequence, TypeVar, cast
 
 import numpy
 from numpy.typing import NDArray
+from onnxruntime import InferenceSession
 
 from .. import utils
 from ..model import DetectorResult, ImgTensor
-from ..protocols import InferenceSessionProtocol, ToTensorStrategyProtocol
+from ..protocols import ToTensorStrategyProtocol
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +143,7 @@ class Yolo26ModelOutputParser:
 class Detector(Generic[T]):
     def __init__(
         self,
-        session: InferenceSessionProtocol,
+        session: InferenceSession,
         to_tensor_strategy: ToTensorStrategyProtocol[T],
         conf_threshold: float = 0.25,
         iou_threshold: float = 0.7,

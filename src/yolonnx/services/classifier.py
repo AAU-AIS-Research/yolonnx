@@ -5,13 +5,10 @@ from typing import Callable, Generic, Sequence, TypeVar
 import numpy
 from numpy import float32
 from numpy.typing import NDArray
+from onnxruntime import InferenceSession, SparseTensor
 
 from ..model import ClassifierResult
-from ..protocols import (
-    InferenceSessionProtocol,
-    SparseTensorProtocol,
-    ToTensorStrategyProtocol,
-)
+from ..protocols import ToTensorStrategyProtocol
 
 T = TypeVar("T")
 logger = logging.getLogger(__name__)
@@ -20,7 +17,7 @@ logger = logging.getLogger(__name__)
 class Classifier(Generic[T]):
     def __init__(
         self,
-        session: InferenceSessionProtocol,
+        session: InferenceSession,
         to_tensor_strategy: ToTensorStrategyProtocol[T],
         name_converter: Callable[[str], str] | None = None,
         threshold: float = 0.1,
@@ -111,7 +108,7 @@ class Classifier(Generic[T]):
         tensor = self.__to_tensor_strategy(img, *self.shape)
         results = self.__session.run(None, {"images": tensor.data})[0]
 
-        if isinstance(results, SparseTensorProtocol):
+        if isinstance(results, SparseTensor):
             results = results.values()
 
         return self.__result_handler(results[0])

@@ -1,12 +1,13 @@
 [project]
 name = "yolonnx"
-version = "0.3.1"
+version = "0.4.0"
 description = "This package lets you run your YOLOv8 detection and classification models using ONNXRuntime."
 authors = [
     {name = "Kasper Fromm Pedersen", email = "kasperf@cs.aau.dk"},
 ]
 dependencies = [
     "numpy==1.26.*",
+    "onnxruntime>=1.20.0",
     "aau-label==0.*"
 ]
 requires-python = ">=3.10,<3.14"
@@ -20,8 +21,7 @@ repository = "https://github.com/fromm1990/yolonnx"
 
 [dependency-groups]
 dev = [
-  "pytest==9.0.*",
-  "onnxruntime==1.21.*"
+  "pytest==9.0.*"
 ]
 
 [build-system]
