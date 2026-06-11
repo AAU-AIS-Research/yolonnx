@@ -86,7 +86,6 @@ class Yolo26ModelOutputParser:
     def __call__(
         self, results: NDArray, tensor: ImgTensor, options: ParserOption
     ) -> list[DetectorResult]:
-        print(tensor.scale)
         predictions = numpy.squeeze(results[0])
 
         # If batched, handle that:
