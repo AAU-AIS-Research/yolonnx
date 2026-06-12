@@ -7,7 +7,7 @@ from aau_label.model import AAULabelImage
 from onnxruntime import InferenceSession
 from PIL import Image, ImageOps
 
-from yolonnx.services import Detector, Yolo26ModelOutputParser
+from yolonnx.services import Detector
 from yolonnx.to_tensor_strategies import PillowToTensorContainStrategy
 
 
@@ -18,11 +18,7 @@ def detector():
     if not model_path:
         raise ValueError(f"Could not {env_var} in environment variables")
     session = InferenceSession(model_path)
-    return Detector(
-        session,
-        PillowToTensorContainStrategy(),
-        output_parser=Yolo26ModelOutputParser(),
-    )
+    return Detector(session, PillowToTensorContainStrategy())
 
 
 @pytest.fixture

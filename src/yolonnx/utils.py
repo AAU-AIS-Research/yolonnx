@@ -46,3 +46,7 @@ def nms(
         sorted_indices = sorted_indices[keep_indices + 1]
 
     return keep_boxes
+
+
+def str_to_bool(val: str) -> bool:
+    return val.lower() == "true"

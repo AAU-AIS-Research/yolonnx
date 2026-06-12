@@ -40,7 +40,7 @@ class ParserOption(Protocol):
 ModelOutputParser = Callable[[NDArray, ImgTensor, ParserOption], list[DetectorResult]]
 
 
-class Yolo8ModelOutputParser:
+class OneToManyParser:
     def __call__(
         self, results: NDArray, tensor: ImgTensor, options: ParserOption
     ) -> list[DetectorResult]:
@@ -66,9 +66,15 @@ class Yolo8ModelOutputParser:
         )
         boxes = boxes.astype(numpy.int32)
 
-        keep = utils.nms(boxes, scores, options.iou_threshold)
+        if options.nms:
+            # NMS is performed inside the model
+            data = zip(boxes, class_ids, scores)
+        else:
+            keep = utils.nms(boxes, scores, options.iou_threshold)
+            data = zip(boxes[keep], class_ids[keep], scores[keep])
+
         rv: list[DetectorResult] = []
-        for bbox, label, score in zip(boxes[keep], class_ids[keep], scores[keep]):
+        for bbox, label, score in data:
             rv.append(
                 DetectorResult(
                     x=bbox[0].item(),
@@ -83,25 +89,15 @@ class Yolo8ModelOutputParser:
         return rv
 
 
-class Yolo26ModelOutputParser:
+class OneToOneParser:
     def __call__(
         self, results: NDArray, tensor: ImgTensor, options: ParserOption
     ) -> list[DetectorResult]:
-        predictions = numpy.squeeze(results[0])
+        predictions = results[0]
+        predictions = predictions[predictions[:, 4] > options.conf_threshold]
 
-        # If batched, handle that:
-        if predictions.ndim == 3:
-            predictions = predictions[0]
-
-        boxes = predictions[:, :4]
-        scores = predictions[:, 4]
-        class_ids = predictions[:, 5].astype(numpy.int32)
-
-        keep = scores > options.conf_threshold
-        scores = scores[keep]
-        class_ids = class_ids[keep]
         boxes = (
-            boxes[keep]
+            predictions[:, :4]
             / numpy.array(
                 [
                     tensor.scale.width,
@@ -112,15 +108,11 @@ class Yolo26ModelOutputParser:
                 dtype=numpy.float32,
             )
         ).astype(numpy.int32)
-
-        if options.nms or options.end2end:
-            data = zip(boxes, class_ids, scores)
-        else:
-            keep = utils.nms(boxes, scores, options.iou_threshold)
-            data = zip(boxes[keep], class_ids[keep], scores[keep])
+        scores = predictions[:, 4]
+        class_ids = predictions[:, 5].astype(numpy.int32)
 
         rv: list[DetectorResult] = []
-        for bbox, label, score in data:
+        for bbox, label, score in zip(boxes, class_ids, scores):
             x0 = bbox[0].item()
             y0 = bbox[1].item()
             x1 = bbox[2].item()
@@ -147,21 +139,22 @@ class Detector(Generic[T]):
         to_tensor_strategy: ToTensorStrategyProtocol[T],
         conf_threshold: float = 0.25,
         iou_threshold: float = 0.7,
-        output_parser: ModelOutputParser = Yolo8ModelOutputParser(),
     ) -> None:
         self.__session = session
         self.__to_tensor_strategy = to_tensor_strategy
         self.__conf_threshold = conf_threshold
         self.__iou_threshold = iou_threshold
-        self.__output_parser = output_parser
 
         meta = self.__session.get_modelmeta()
         self.__names: dict[int, str] = ast.literal_eval(
             meta.custom_metadata_map["names"]
         )
-        self.__end2end = bool(meta.custom_metadata_map.get("end2end", False))
+
+        self.__end2end = utils.str_to_bool(
+            meta.custom_metadata_map.get("end2end", "False")
+        )
         args: dict[str, Any] = ast.literal_eval(meta.custom_metadata_map["args"])
-        self.__nms = args.get("nms", False)
+        self.__nms: bool = args.get("nms", "False")
 
     @property
     def conf_threshold(self) -> float:
@@ -190,4 +183,7 @@ class Detector(Generic[T]):
     def run(self, img: T) -> Sequence[DetectorResult]:
         tensor = self.__to_tensor_strategy(img, *self.shape)
         results = cast(list[NDArray], self.__session.run(None, {"images": tensor.data}))
-        return self.__output_parser(results[0], tensor, self)
+
+        if self.end2end or self.nms:
+            return OneToOneParser()(results[0], tensor, self)
+        return OneToManyParser()(results[0], tensor, self)
